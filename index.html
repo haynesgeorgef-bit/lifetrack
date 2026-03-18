@@ -140,6 +140,21 @@ input[type="date"],input[type="time"]{color-scheme:dark}
 .setting-row:last-child{border:none}
 .setting-label{font-size:15px}
 .setting-val{font-family:var(--mono);font-size:14px;color:var(--accent)}
+
+/* Coach */
+.coach-card{background:var(--bg2);border-radius:var(--radius);padding:16px;margin-bottom:12px;border-left:3px solid var(--accent2)}
+.coach-briefing{font-size:14px;color:var(--text2);line-height:1.6}
+.coach-alert{background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;font-size:13px;color:var(--error);line-height:1.4}
+.coach-alert-warn{background:rgba(255,165,0,.08);border-color:rgba(255,165,0,.2);color:var(--warning)}
+.coach-insight{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.coach-insight:last-child{border:none}
+.coach-insight-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.coach-insight-body{flex:1;min-width:0}
+.coach-insight-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+.coach-insight-val{font-family:var(--mono);font-size:16px;font-weight:600;margin-top:2px}
+.coach-sync{font-size:11px;color:var(--text3);text-align:center;padding:12px 0}
+.coach-sync-btn{color:var(--accent2);cursor:pointer;text-decoration:underline}
+.coach-tag{display:inline-block;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:600;margin-right:4px;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -203,6 +218,91 @@ function toast(msg) {
   toastTimer = setTimeout(() => { el.classList.remove('show'); toastTimer = null; }, 2200);
 }
 
+// ========== COACH DATA ==========
+let coachData = null;
+let coachSyncing = false;
+
+function getCoachCache() {
+  try { return JSON.parse(localStorage.getItem('lt_coach')) || null } catch { return null }
+}
+function setCoachCache(data) {
+  localStorage.setItem('lt_coach', JSON.stringify(data));
+}
+
+async function syncCoach(force = false) {
+  const cached = getCoachCache();
+  // Only auto-fetch once per hour unless forced
+  if (!force && cached && cached._fetchedAt && (Date.now() - cached._fetchedAt < 3600000)) {
+    coachData = cached;
+    return;
+  }
+  coachSyncing = true;
+  render();
+  try {
+    const resp = await fetch('coach-data.json?t=' + Date.now());
+    if (!resp.ok) throw new Error('No coach data');
+    const data = await resp.json();
+    data._fetchedAt = Date.now();
+    coachData = data;
+    setCoachCache(data);
+    // Auto-merge synced data into LifeTrack collections
+    if (data.sync) mergeCoachSync(data.sync);
+  } catch (e) {
+    // Fall back to cache
+    if (cached) coachData = cached;
+  }
+  coachSyncing = false;
+  render();
+}
+
+function mergeCoachSync(sync) {
+  let changed = false;
+  // Merge steps — update if newer for same date
+  if (sync.steps && Array.isArray(sync.steps)) {
+    let steps = DB.steps;
+    sync.steps.forEach(s => {
+      const existing = steps.find(x => x.date === s.date);
+      if (!existing) { steps.push({id: uid(), date: s.date, count: s.count, createdAt: Date.now(), source: 'garmin'}); changed = true; }
+      else if (s.count > existing.count && existing.source === 'garmin') { existing.count = s.count; changed = true; }
+    });
+    if (changed) DB.steps = steps;
+  }
+  // Merge sleep
+  if (sync.sleep && Array.isArray(sync.sleep)) {
+    let records = DB.sleep;
+    sync.sleep.forEach(s => {
+      if (!records.find(x => x.date === s.date && x.source === 'garmin')) {
+        records.push({id: uid(), date: s.date, bedtime: s.bedtime, wakeTime: s.wakeTime, hours: s.hours, quality: s.quality || null, createdAt: Date.now(), source: 'garmin'});
+        changed = true;
+      }
+    });
+    if (changed) DB.sleep = records;
+  }
+  // Merge metrics (weight, BP from Garmin)
+  if (sync.metrics && Array.isArray(sync.metrics)) {
+    let metrics = DB.metrics;
+    sync.metrics.forEach(m => {
+      if (!metrics.find(x => x.date === m.date && x.type === m.type && x.source === 'garmin')) {
+        metrics.push({...m, id: uid(), createdAt: Date.now(), source: 'garmin'});
+        changed = true;
+      }
+    });
+    if (changed) DB.metrics = metrics;
+  }
+  // Merge workouts from Hevy
+  if (sync.workouts && Array.isArray(sync.workouts)) {
+    let workouts = DB.workouts;
+    sync.workouts.forEach(w => {
+      if (!workouts.find(x => x.date === w.date && x.exercise === w.exercise && x.source === 'hevy')) {
+        workouts.push({...w, id: uid(), createdAt: Date.now(), source: 'hevy'});
+        changed = true;
+      }
+    });
+    if (changed) DB.workouts = workouts;
+  }
+  if (changed) toast('Garmin data synced');
+}
+
 // ========== STATE ==========
 let currentTab = 'home';
 let sheetOpen = null;
@@ -219,6 +319,7 @@ const icons = {
   trash: `<svg viewBox="0 0 24 24" width="14" height="14"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>`,
   edit: `<svg viewBox="0 0 24 24" width="14" height="14"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 113 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round"/></svg>`,
   plan: `<svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  coach: `<svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 };
 
 // ========== COMPLIANCE ==========
@@ -259,6 +360,7 @@ function render() {
   let screen = '';
   switch(currentTab) {
     case 'home': screen = renderHome(); break;
+    case 'coach': screen = renderCoach(); break;
     case 'plan': screen = renderPlan(); break;
     case 'workouts': screen = renderWorkouts(); break;
     case 'meals': screen = renderMeals(); break;
@@ -275,6 +377,7 @@ function render() {
     ${renderSheet()}
     <nav class="tabs">
       ${renderTab('home','Home',icons.home, missed > 0 ? missed : 0)}
+      ${renderTab('coach','Coach',icons.coach, coachData?.alerts?.length || 0)}
       ${renderTab('plan','Plan',icons.plan)}
       ${renderTab('workouts','Workouts',icons.workout)}
       ${renderTab('meals','Meals',icons.meals)}
@@ -859,6 +962,138 @@ function renderPlan() {
   `;
 }
 
+// ========== COACH ==========
+function renderCoach() {
+  if (!coachData) {
+    return `
+      <div class="header anim"><h1>AI <span class="header-accent">Coach</span></h1></div>
+      <div class="empty">
+        <div class="empty-icon">🤖</div>
+        <div class="empty-text">${coachSyncing ? 'Syncing with your coach...' : 'No coach data yet.'}<br>
+        ${!coachSyncing ? '<button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="syncCoach(true)">Sync Now</button>' : ''}</div>
+      </div>`;
+  }
+
+  const c = coachData;
+  const briefing = c.briefing || {};
+  const garmin = c.garmin || {};
+  const alerts = c.alerts || [];
+  const workout = c.todayWorkout || {};
+  const recovery = c.recovery || {};
+  const insights = c.insights || [];
+
+  // TSB color
+  const tsbVal = garmin.tsb ?? null;
+  const tsbColor = tsbVal === null ? 'var(--text3)' : tsbVal > 10 ? 'var(--success)' : tsbVal > -10 ? 'var(--warning)' : 'var(--error)';
+  const tsbLabel = tsbVal === null ? '—' : tsbVal > 10 ? 'Fresh' : tsbVal > -10 ? 'Neutral' : 'Fatigued';
+
+  // HR color
+  const hrVal = garmin.restingHR ?? null;
+  const hrColor = hrVal === null ? 'var(--text3)' : hrVal < 60 ? 'var(--success)' : hrVal < 70 ? 'var(--warning)' : 'var(--error)';
+
+  return `
+    <div class="header anim">
+      <h1>AI <span class="header-accent">Coach</span></h1>
+      <button class="btn btn-secondary btn-sm" onclick="syncCoach(true)" ${coachSyncing ? 'disabled' : ''}>${coachSyncing ? '...' : 'Sync'}</button>
+    </div>
+
+    ${alerts.length > 0 ? `
+    <div class="anim">
+      ${alerts.map(a => `
+        <div class="coach-alert ${a.level === 'warn' ? 'coach-alert-warn' : ''}">
+          ${a.level === 'warn' ? '⚠️' : '🚨'} ${esc(a.message)}
+        </div>
+      `).join('')}
+    </div>` : ''}
+
+    ${briefing.message ? `
+    <div class="coach-card anim anim-d1">
+      <div style="font-size:11px;color:var(--accent2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">
+        ${esc(briefing.title || 'Daily Briefing')}
+        ${briefing.time ? `<span style="float:right;color:var(--text3);font-weight:400">${esc(briefing.time)}</span>` : ''}
+      </div>
+      <div class="coach-briefing">${esc(briefing.message)}</div>
+    </div>` : ''}
+
+    ${workout.name ? `
+    <div class="coach-card anim anim-d1" style="border-left-color:var(--accent)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-size:11px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.04em">Today's Session</span>
+        ${workout.type ? `<span class="coach-tag" style="background:rgba(255,107,53,.15);color:var(--accent)">${esc(workout.type)}</span>` : ''}
+      </div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:6px">${esc(workout.name)}</div>
+      ${workout.exercises ? `<div style="font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:8px">${esc(workout.exercises)}</div>` : ''}
+      ${workout.prehab ? `<div style="font-size:12px;color:var(--warning);line-height:1.4">🛡️ ${esc(workout.prehab)}</div>` : ''}
+      ${workout.note ? `<div style="font-size:12px;color:var(--text3);margin-top:6px;font-style:italic">${esc(workout.note)}</div>` : ''}
+    </div>` : ''}
+
+    <div class="stat-row anim anim-d2">
+      <div class="stat">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">TSB</div>
+        <div class="stat-val" style="color:${tsbColor}">${tsbVal !== null ? (tsbVal > 0 ? '+' : '') + tsbVal : '—'}</div>
+        <div class="stat-label">${tsbLabel}</div>
+      </div>
+      <div class="stat">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Resting HR</div>
+        <div class="stat-val" style="color:${hrColor}">${hrVal !== null ? hrVal : '—'}</div>
+        <div class="stat-label">bpm</div>
+      </div>
+      <div class="stat">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">HRV</div>
+        <div class="stat-val" style="color:var(--accent2)">${garmin.hrv ?? '—'}</div>
+        <div class="stat-label">ms</div>
+      </div>
+    </div>
+
+    <div class="stat-row anim anim-d2">
+      <div class="stat">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">CTL</div>
+        <div class="stat-val">${garmin.ctl ?? '—'}</div>
+        <div class="stat-label">Fitness</div>
+      </div>
+      <div class="stat">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">ATL</div>
+        <div class="stat-val">${garmin.atl ?? '—'}</div>
+        <div class="stat-label">Fatigue</div>
+      </div>
+      <div class="stat">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Sleep</div>
+        <div class="stat-val" style="color:${(garmin.sleepScore ?? 0) >= 80 ? 'var(--success)' : (garmin.sleepScore ?? 0) >= 60 ? 'var(--warning)' : 'var(--text3)'}">${garmin.sleepScore ?? '—'}</div>
+        <div class="stat-label">Score</div>
+      </div>
+    </div>
+
+    ${recovery.status ? `
+    <div class="coach-card anim anim-d3" style="border-left-color:${recovery.status === 'good' ? 'var(--success)' : recovery.status === 'moderate' ? 'var(--warning)' : 'var(--error)'}">
+      <div style="font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Recovery Status</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:20px">${recovery.status === 'good' ? '🟢' : recovery.status === 'moderate' ? '🟡' : '🔴'}</span>
+        <span style="font-size:16px;font-weight:700">${esc(recovery.label || recovery.status)}</span>
+      </div>
+      ${recovery.message ? `<div style="font-size:13px;color:var(--text2);line-height:1.4">${esc(recovery.message)}</div>` : ''}
+    </div>` : ''}
+
+    ${insights.length > 0 ? `
+    <div class="card anim anim-d3">
+      <div class="card-title" style="margin-bottom:8px">Insights</div>
+      ${insights.map(i => `
+        <div class="coach-insight">
+          <div class="coach-insight-icon" style="background:${i.color || 'var(--bg3)'}">${i.icon || '💡'}</div>
+          <div class="coach-insight-body">
+            <div class="coach-insight-label">${esc(i.label)}</div>
+            <div style="font-size:13px;color:var(--text2);margin-top:2px;line-height:1.4">${esc(i.text)}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>` : ''}
+
+    <div class="coach-sync anim anim-d4">
+      ${c.generatedAt ? `Last updated: ${new Date(c.generatedAt).toLocaleString('en-GB', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}` : ''}
+      ${c.source ? ` · via ${esc(c.source)}` : ''}
+    </div>
+  `;
+}
+
 // ========== SETTINGS ==========
 function renderSettings() {
   const t = DB.targets;
@@ -897,9 +1132,9 @@ function renderSettings() {
     
     <div class="card anim anim-d3">
       <div class="card-title" style="margin-bottom:12px">About</div>
-      <div class="setting-row"><span class="setting-label">Version</span><span class="setting-val">1.2.0</span></div>
+      <div class="setting-row"><span class="setting-label">Version</span><span class="setting-val">2.0.0</span></div>
       <div class="setting-row"><span class="setting-label">Storage</span><span class="setting-val">${(new Blob([JSON.stringify(localStorage)]).size / 1024).toFixed(1)} KB</span></div>
-      <div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5">LifeTrack PWA. All data stored locally on your device. No server, no tracking, no ads.</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:8px;line-height:1.5">LifeTrack PWA with AI Coach. Local data + Garmin/Hevy sync. No server, no tracking, no ads.</div>
     </div>
     
     <button class="btn btn-danger" style="width:100%;margin-top:8px" onclick="if(confirm('Delete ALL data? This cannot be undone.')){localStorage.clear();location.reload()}">Reset All Data</button>
@@ -1255,7 +1490,10 @@ function closeSheet() {
 }
 
 // ========== INIT ==========
+// Load cached coach data immediately, then background sync
+coachData = getCoachCache();
 render();
+syncCoach();
 </script>
 </body>
 </html>

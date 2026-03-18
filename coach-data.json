@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-03-18T21:00:00Z",
+  "source": "fitness-coach",
+  "briefing": {
+    "title": "Evening Check-In",
+    "time": "17:00",
+    "message": "Coach data will appear here once your daily sync runs. Head to Settings to trigger a manual sync, or wait for the scheduled task to kick in."
+  },
+  "todayWorkout": {
+    "name": "Upper Strength",
+    "type": "Push",
+    "exercises": "Bench 4x6-8, OHP 3x8-10, Rows 4x6-8, Face pulls 3x12, Arms 2x10-12",
+    "prehab": "Rotator cuff ext rotations 3x15, band pull-aparts 3x15",
+    "note": "Keep RPE 7-8. If shoulder feels tight, swap OHP for landmine press."
+  },
+  "garmin": {
+    "ctl": null,
+    "atl": null,
+    "tsb": null,
+    "restingHR": null,
+    "hrv": null,
+    "sleepScore": null
+  },
+  "recovery": {
+    "status": "moderate",
+    "label": "Moderate",
+    "message": "Awaiting Garmin sync for accurate recovery data. Log your sleep and the coach will adjust recommendations."
+  },
+  "alerts": [],
+  "insights": [
+    {
+      "icon": "🔗",
+      "label": "Setup",
+      "text": "Coach integration is live. Once the daily sync task runs, your Garmin data, workout plan, and AI coaching insights will appear here automatically.",
+      "color": "rgba(0,217,255,.15)"
+    }
+  ],
+  "sync": {
+    "steps": [],
+    "sleep": [],
+    "metrics": [],
+    "workouts": []
+  }
+}
