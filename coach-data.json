@@ -1,44 +1,105 @@
 {
-  "generatedAt": "2026-03-18T21:00:00Z",
+  "generatedAt": "2026-03-19T12:00:00Z",
   "source": "fitness-coach",
   "briefing": {
-    "title": "Evening Check-In",
-    "time": "17:00",
-    "message": "Coach data will appear here once your daily sync runs. Head to Settings to trigger a manual sync, or wait for the scheduled task to kick in."
+    "title": "Midday Check-In",
+    "time": "12:00",
+    "message": "Good afternoon mate. 8.3h sleep last night — solid. Yesterday was a cracker with 10.9k steps, well above target. Last gym session was Sunday (Upper 1) so you're 4 days out — you're due a Pull session today or tomorrow. TSB is -1.1 so you're in a normal training state, no need to hold back. Resting HR sitting at 61bpm. Step average this week is low (4.3k) — try to get a walk in this evening to bring the weekly average up."
   },
   "todayWorkout": {
-    "name": "Upper Strength",
-    "type": "Push",
-    "exercises": "Bench 4x6-8, OHP 3x8-10, Rows 4x6-8, Face pulls 3x12, Arms 2x10-12",
-    "prehab": "Rotator cuff ext rotations 3x15, band pull-aparts 3x15",
-    "note": "Keep RPE 7-8. If shoulder feels tight, swap OHP for landmine press."
+    "name": "Pull Day",
+    "type": "Pull",
+    "exercises": "Barbell Rows 4x6-8, Weighted Pull-ups 4x6-8, Face Pulls 3x12-15, DB Curls 3x10-12, Hammer Curls 2x10-12",
+    "prehab": "Achilles eccentric drops 3x15, band pull-aparts 3x15, shoulder ext rotations 3x15",
+    "note": "Last Upper was Sunday — you're fresh. Aim RPE 7-8 on compounds. Progress rows by 2.5kg if last session felt easy."
   },
   "garmin": {
-    "ctl": null,
-    "atl": null,
-    "tsb": null,
-    "restingHR": null,
+    "ctl": 7.7,
+    "atl": 8.7,
+    "tsb": -1.1,
+    "restingHR": 61,
     "hrv": null,
     "sleepScore": null
   },
   "recovery": {
-    "status": "moderate",
-    "label": "Moderate",
-    "message": "Awaiting Garmin sync for accurate recovery data. Log your sleep and the coach will adjust recommendations."
+    "status": "good",
+    "label": "Fresh",
+    "message": "TSB -1.1 — normal training state. 4 days since last gym session, you're well recovered. Good to go hard today."
   },
   "alerts": [],
   "insights": [
     {
-      "icon": "🔗",
-      "label": "Setup",
-      "text": "Coach integration is live. Once the daily sync task runs, your Garmin data, workout plan, and AI coaching insights will appear here automatically.",
+      "icon": "👣",
+      "label": "Steps",
+      "text": "Yesterday was great (10.9k) but your 7-day average is only 4.3k. Consistency matters more than one big day — aim for 8k+ daily.",
+      "color": "rgba(255,170,0,.15)"
+    },
+    {
+      "icon": "😴",
+      "label": "Sleep",
+      "text": "Averaging 7.6h over the last 2 weeks with mostly Fair/Poor quality ratings. Hours are decent but quality could improve — try cutting screens 30min before bed.",
+      "color": "rgba(100,149,237,.15)"
+    },
+    {
+      "icon": "🏋️",
+      "label": "Training",
+      "text": "12 activities in 14 days — good volume. Mix of skiing, cycling, and 2 strength sessions. Aim for 3 gym sessions this week to stay on track.",
       "color": "rgba(0,217,255,.15)"
+    },
+    {
+      "icon": "❤️",
+      "label": "Heart",
+      "text": "Resting HR 61bpm — slightly elevated from your baseline. Keep sodium under 2g and hydration at 2.5L+ today.",
+      "color": "rgba(255,100,100,.15)"
     }
   ],
   "sync": {
-    "steps": [],
-    "sleep": [],
+    "steps": [
+      {"date": "2026-03-05", "count": 2755},
+      {"date": "2026-03-06", "count": 3868},
+      {"date": "2026-03-07", "count": 3939},
+      {"date": "2026-03-08", "count": 7688},
+      {"date": "2026-03-09", "count": 5448},
+      {"date": "2026-03-10", "count": 3804},
+      {"date": "2026-03-11", "count": 1997},
+      {"date": "2026-03-12", "count": 2331},
+      {"date": "2026-03-13", "count": 9444},
+      {"date": "2026-03-14", "count": 6731},
+      {"date": "2026-03-15", "count": 2821},
+      {"date": "2026-03-16", "count": 5729},
+      {"date": "2026-03-17", "count": 2060},
+      {"date": "2026-03-18", "count": 10921},
+      {"date": "2026-03-19", "count": 58}
+    ],
+    "sleep": [
+      {"date": "2026-03-05", "bedtime": "23:00", "wakeTime": "07:41", "hours": 8.7, "quality": "Poor"},
+      {"date": "2026-03-06", "bedtime": "23:00", "wakeTime": "07:36", "hours": 8.6, "quality": "Poor"},
+      {"date": "2026-03-07", "bedtime": "23:00", "wakeTime": "06:36", "hours": 7.6, "quality": "Fair"},
+      {"date": "2026-03-08", "bedtime": "23:00", "wakeTime": "06:06", "hours": 7.1, "quality": "Fair"},
+      {"date": "2026-03-09", "bedtime": "23:00", "wakeTime": "07:06", "hours": 8.1, "quality": "Poor"},
+      {"date": "2026-03-10", "bedtime": "23:00", "wakeTime": "05:53", "hours": 6.9, "quality": "Good"},
+      {"date": "2026-03-11", "bedtime": "23:00", "wakeTime": "07:00", "hours": 8.0, "quality": "Good"},
+      {"date": "2026-03-12", "bedtime": "23:00", "wakeTime": "06:36", "hours": 7.6, "quality": "Poor"},
+      {"date": "2026-03-13", "bedtime": "23:00", "wakeTime": "05:41", "hours": 6.7, "quality": "Fair"},
+      {"date": "2026-03-14", "bedtime": "23:00", "wakeTime": "05:11", "hours": 6.2, "quality": "Good"},
+      {"date": "2026-03-15", "bedtime": "23:00", "wakeTime": "06:48", "hours": 7.8, "quality": "Fair"},
+      {"date": "2026-03-16", "bedtime": "23:00", "wakeTime": "05:41", "hours": 6.7, "quality": "Good"},
+      {"date": "2026-03-18", "bedtime": "23:00", "wakeTime": "07:18", "hours": 8.3, "quality": "Fair"}
+    ],
     "metrics": [],
-    "workouts": []
+    "workouts": [
+      {"date": "2026-03-05", "exercise": "Morning Alpine Ski (43.2km)", "type": "cardio", "duration": 99, "rpe": null},
+      {"date": "2026-03-06", "exercise": "Morning Alpine Ski (42.8km)", "type": "cardio", "duration": 104, "rpe": null},
+      {"date": "2026-03-06", "exercise": "Afternoon Alpine Ski (3.2km)", "type": "cardio", "duration": 6, "rpe": null},
+      {"date": "2026-03-07", "exercise": "Morning Alpine Ski (43.3km)", "type": "cardio", "duration": 100, "rpe": null},
+      {"date": "2026-03-09", "exercise": "Morning Ride (10.6km)", "type": "cardio", "duration": 23, "rpe": null},
+      {"date": "2026-03-09", "exercise": "Upper 1", "type": "strength", "duration": 0, "rpe": null},
+      {"date": "2026-03-09", "exercise": "Evening Ride (10.6km)", "type": "cardio", "duration": 24, "rpe": null},
+      {"date": "2026-03-15", "exercise": "Lunch Ride (27.1km)", "type": "cardio", "duration": 59, "rpe": null},
+      {"date": "2026-03-15", "exercise": "Afternoon Ride (4.2km)", "type": "cardio", "duration": 11, "rpe": null},
+      {"date": "2026-03-16", "exercise": "Morning Ride (10.6km)", "type": "cardio", "duration": 23, "rpe": null},
+      {"date": "2026-03-16", "exercise": "Upper 1", "type": "strength", "duration": 0, "rpe": null},
+      {"date": "2026-03-16", "exercise": "Night Ride (10.8km)", "type": "cardio", "duration": 25, "rpe": null}
+    ]
   }
 }
