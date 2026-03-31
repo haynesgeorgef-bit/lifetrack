@@ -1,55 +1,64 @@
 {
-  "generatedAt": "2026-03-19T12:00:00Z",
+  "generatedAt": "2026-03-31T07:00:00Z",
   "source": "fitness-coach",
   "briefing": {
-    "title": "Midday Check-In",
-    "time": "12:00",
-    "message": "Good afternoon mate. 8.3h sleep last night — solid. Yesterday was a cracker with 10.9k steps, well above target. Last gym session was Sunday (Upper 1) so you're 4 days out — you're due a Pull session today or tomorrow. TSB is -1.1 so you're in a normal training state, no need to hold back. Resting HR sitting at 61bpm. Step average this week is low (4.3k) — try to get a walk in this evening to bring the weekly average up."
+    "title": "Morning Briefing",
+    "time": "07:00",
+    "message": "Morning mate. Note: live Garmin data couldn't be pulled today — VPS host key changed (needs fixing). Working from data last synced 2026-03-19. Last known TSB was -3.6 (normal), resting HR 55bpm (good — right at baseline). Last gym session was Upper 1 on Mar 16, so you're well overdue a Push Day to kick off the week. With nearly 2 weeks since the last logged session, start conservatively — RPE 7 max on compounds, don't chase old weights. Today's a Monday so it's a solid day to reset the week with a proper Push session. Keep sodium under 2g today and hydrate well — 2.5L minimum."
   },
   "todayWorkout": {
-    "name": "Pull Day",
-    "type": "Pull",
-    "exercises": "Barbell Rows 4x6-8, Weighted Pull-ups 4x6-8, Face Pulls 3x12-15, DB Curls 3x10-12, Hammer Curls 2x10-12",
-    "prehab": "Achilles eccentric drops 3x15, band pull-aparts 3x15, shoulder ext rotations 3x15",
-    "note": "Last Upper was Sunday — you're fresh. Aim RPE 7-8 on compounds. Progress rows by 2.5kg if last session felt easy."
+    "name": "Push Day",
+    "type": "Push",
+    "exercises": "Flat Bench Press 4x6-8, Overhead Press 4x6-8, Lateral Raises 3x12-15, Tricep Pushdowns 3x10-12, Cable Flyes 3x12",
+    "prehab": "Standing calf raises 3x15, eccentric single-leg calf lower 3x10 each, band pull-aparts 3x15, shoulder external rotations 3x15",
+    "note": "First session back after a gap — start at 90% of last working weight, focus on form. Increase if RPE ≤7 at the end of the session, not before."
   },
   "garmin": {
-    "ctl": 7.7,
-    "atl": 8.7,
-    "tsb": -1.1,
-    "restingHR": 61,
+    "ctl": 8.1,
+    "atl": 9.2,
+    "tsb": -3.6,
+    "restingHR": 55,
     "hrv": null,
     "sleepScore": null
   },
   "recovery": {
     "status": "good",
     "label": "Fresh",
-    "message": "TSB -1.1 — normal training state. 4 days since last gym session, you're well recovered. Good to go hard today."
+    "message": "Last known TSB was -3.6 (2026-03-18) — with nearly 2 weeks since last sync, form is likely neutral or positive. Resting HR 55bpm was at baseline. No data since Mar 19 — treat today as a fresh start."
   },
-  "alerts": [],
+  "alerts": [
+    {
+      "level": "warn",
+      "message": "VPS SSH host key changed — live Garmin sync is blocked. Verify this is expected (server rebuild) before reconnecting. Check known_hosts and confirm with VPS provider if unsure."
+    },
+    {
+      "level": "warn",
+      "message": "Data is 12 days stale (last sync: 2026-03-19). Garmin metrics shown are estimates — fix SSH to resume live tracking."
+    }
+  ],
   "insights": [
     {
       "icon": "👣",
       "label": "Steps",
-      "text": "Yesterday was great (10.9k) but your 7-day average is only 4.3k. Consistency matters more than one big day — aim for 8k+ daily.",
+      "text": "Last 14-day average (to Mar 19) was ~5,000 steps/day — below the 8k+ target. Daily walks are one of the most impactful things for BP reduction. Try to stack 8k+ today.",
       "color": "rgba(255,170,0,.15)"
     },
     {
       "icon": "😴",
       "label": "Sleep",
-      "text": "Averaging 7.6h over the last 2 weeks with mostly Fair/Poor quality ratings. Hours are decent but quality could improve — try cutting screens 30min before bed.",
+      "text": "Recent sleep averaging ~7.5h but quality has been mostly Poor/Fair. You're getting the hours but not the depth — try cutting screens 30 min before bed and keeping a consistent wake time.",
       "color": "rgba(100,149,237,.15)"
     },
     {
       "icon": "🏋️",
       "label": "Training",
-      "text": "12 activities in 14 days — good volume. Mix of skiing, cycling, and 2 strength sessions. Aim for 3 gym sessions this week to stay on track.",
+      "text": "Last gym session was 15 days ago (Mar 16). Getting back to 3 sessions/week this week will help both body composition and BP. Push today, Pull mid-week, optional mobility at the weekend.",
       "color": "rgba(0,217,255,.15)"
     },
     {
       "icon": "❤️",
-      "label": "Heart",
-      "text": "Resting HR 61bpm — slightly elevated from your baseline. Keep sodium under 2g and hydration at 2.5L+ today.",
+      "label": "BP Target",
+      "text": "Resting HR 55bpm is solid. BP target is <135/85 — daily walks + 3x/week resistance training + sodium <2g are the three biggest levers. Stay consistent this week.",
       "color": "rgba(255,100,100,.15)"
     }
   ],
